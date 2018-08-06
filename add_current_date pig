@@ -1,0 +1,29 @@
+set output.compression.enabled true;
+set output.compression.codec org.apache.hadoop.io.compress.SnappyCodec;
+
+inputFiles = LOAD '/user/hdfs/test/pig_date_test/*' using PigStorage(',')as (id:int, name:chararray, dept:chararray);
+
+add_date = FOREACH inputFiles GENERATE *, ToString(CurrentTime(),'yyyy-MM-dd') as date:chararray;
+
+STORE add_date INTO '/user/hdfs/test/pig_date_test2' USING PigStorage();
+
+
+---------------sample 2 passing parametter to pig script
+
+set output.compression.enabled true;
+set output.compression.codec org.apache.hadoop.io.compress.SnappyCodec;
+
+inputFiles = LOAD '$FILE' using PigStorage(',')as (id:int, name:chararray, dept:chararray);
+
+add_date = FOREACH inputFiles GENERATE *, ToString(CurrentTime(),'yyyy-MM-dd') as date:chararray;
+
+STORE add_date INTO '$DATE' USING PigStorage();
+
+--------to run sample 2
+
+/usr/local/pig/bin/pig -param FILE='/user/hdfs/DuIps/uncompressed/'$(date -d "-6 days" +%Y%m%d)'/*' -param DATE='/user/hdfs/DuIps/compressed/'$(date -d "-6 days" +%Y%m%d) -f /home/hduser/pig_scripts/firewall_add_date.pig
+
+
+
+
+
